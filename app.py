@@ -1,14 +1,11 @@
-if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
 from flask import Flask, render_template, request, jsonify
 import pickle
-import requests
 import feedparser
+import os
 
 app = Flask(__name__)
 
+# Load model
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
@@ -31,9 +28,8 @@ def predict():
         "confidence": confidence
     })
 
-
 # ----------------------------
-# BBC NEWS (RSS)
+# BBC NEWS RSS
 # ----------------------------
 @app.route("/bbc")
 def bbc_news():
@@ -48,7 +44,6 @@ def bbc_news():
         })
 
     return jsonify(news)
-
 
 # ----------------------------
 # GOOGLE NEWS RSS
@@ -67,14 +62,16 @@ def google_news():
 
     return jsonify(news)
 
-
 # ----------------------------
-# UI
+# HOME PAGE
 # ----------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
+# ----------------------------
+# RUN APP
+# ----------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
