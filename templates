@@ -1,1 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Fact Checker + Live News</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
 
+        textarea {
+            width: 60%;
+            height: 120px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 10px;
+            background: #22c55e;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .box {
+            margin-top: 20px;
+        }
+
+        .news {
+            text-align: left;
+            width: 60%;
+            margin: auto;
+        }
+
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🔎 AI Fact Checker + LIVE NEWS</h1>
+
+<!-- AI CHECK -->
+<textarea id="text" placeholder="Enter news..."></textarea>
+<br>
+<button onclick="checkNews()">Check AI</button>
+
+<div id="result"></div>
+
+<hr>
+
+<!-- NEWS BUTTONS -->
+<button onclick="loadBBC()">Load BBC News</button>
+<button onclick="loadGoogle()">Load Google News</button>
+
+<div class="news" id="news"></div>
+
+<script>
+
+// ---------------- AI CHECK ----------------
+function checkNews() {
+    let text = document.getElementById("text").value;
+
+    fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({text})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerHTML =
+        `<h2>${data.result}</h2><p>Confidence: ${data.confidence}%</p>`;
+    });
+}
+
+// ---------------- BBC ----------------
+function loadBBC() {
+    fetch("/bbc")
+    .then(res => res.json())
+    .then(data => {
+        showNews(data);
+    });
+}
+
+// ---------------- GOOGLE NEWS ----------------
+function loadGoogle() {
+    fetch("/google")
+    .then(res => res.json())
+    .then(data => {
+        showNews(data);
+    });
+}
+
+// ---------------- DISPLAY ----------------
+function showNews(data) {
+    let html = "<h2>Latest News</h2>";
+
+    data.forEach(n => {
+        html += `<p>📰 <a href="${n.link}" target="_blank">${n.title}</a></p>`;
+    });
+
+    document.getElementById("news").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
